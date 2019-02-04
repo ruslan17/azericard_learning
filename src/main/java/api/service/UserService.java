@@ -1,34 +1,41 @@
 package api.service;
 
-import api.exceptions.WrongAgeException;
 import api.model.User;
+import api.repository.UserRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
+import java.time.LocalDate;
+import java.util.List;
 
 @Service
 public class UserService {
 
-//    private static final HashMap<Integer, User> users = new HashMap<>();
-//
-//    static {
-//        users.put(1, new User(1, "John", 22));
-//    }
+    private final UserRepository repository;
+
+    public UserService(UserRepository repository) {
+        this.repository = repository;
+    }
 
     public void saveUser(User user) {
-        if (user.getAge() > 150) {
-            throw new WrongAgeException("Age is wrong!");
-        }
-        else System.out.println(user);
+        repository.save(user);
     }
 
     public User getUser(Integer id) {
-        if (id == 1) {
-            User user = new User();
-            user.setName("John");
-            user.setAge(25);
-            return user;
-        }
-        return null;
+       return repository.findById(id).orElseThrow(() -> new RuntimeException("No such user!"));
+    }
+
+    public List<User> findAllByBirthDateAndAndName(LocalDate date, String name) {
+        return repository.findAllByBirthDateAndAndName(date, name);
+    }
+
+    public List<User> findAllByNameCustom(String name) {
+        return repository.findAllByName(name);
+//        return null;
+    }
+
+    public List<User> findAllByEmailCustom(String email) {
+        return repository.findAllByEmailCustom(email);
     }
 }
